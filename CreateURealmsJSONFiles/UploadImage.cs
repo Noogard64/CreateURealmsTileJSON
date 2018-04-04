@@ -1,86 +1,55 @@
 ﻿using System;
-using System.Linq;
 using System.Text;
 using System.IO;
 using System.Net;
 using System.Collections.Specialized;
-using System.Drawing;
+using Newtonsoft.Json.Linq;
 
 namespace CreateURealmsJSONFiles
 {
     class UploadImage
     {
-        static public string UploadImageWithEasyImgur(string file)
+       
+        static public string UploadImageToImgur(string file)
         {
-            Console.WriteLine("Processing " + file.ToString());
 
-            var fileName = file.ToString();
+            string jsonResults = uploadimage(file);
+            string url = getURLFromJson(jsonResults);
+            return url;
 
-            var logFile = @"C:\Users\sean-\AppData\Roaming\EasyImgur\easyimgur.log";
-            File.Delete(logFile);
+        }
 
-            Bat.ExecuteCommand(@"C:\Users\sean-\Downloads\EasyImgur_v0-3-6\EasyImgur.exe " + file);
-            do
-            {
-                System.Threading.Thread.Sleep(1000);
-            } while (File.Exists(logFile) == false);
 
-            var lastLine = "";
-            do
-            {
-                try
-                {
-                    lastLine = File.ReadLines(@"C:\Users\sean-\AppData\Roaming\EasyImgur\easyimgur.log").Last();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            } while (lastLine.Contains("Showed tooltip with title \"Success!\" and text \"Upload placed in history:") == false);
-            var url = lastLine.Remove(0, 107);
-            url = url.Replace("\".", "");
+        static public string getURLFromJson(string jsonResults)
+        {
+            dynamic stuff = JObject.Parse(jsonResults);
+
+            string url = stuff.data.link;
+            Console.WriteLine(url);
             return url;
         }
-        static public void UploadImageToImgur(string file)
-        {
-            //"3c218a661ce5aeaf4af53e9a3d230473ee10781b"
 
-
-
-
-
-            WebClient client = new WebClient();
-            NameValueCollection values = new NameValueCollection();
-            values["image"] = Convert.ToBase64String(File.ReadAllBytes(file));
-            values["clientId"] = "c927064c3cd35e5";
-            byte[] responseBytes = client.UploadValues("https://api.imgur.com/3/upload.xml", values);
-            string response = Encoding.Default.GetString(responseBytes);
-            client.Dispose();
-
-        }
-
-        static public void UploadImageVersion2(string file)
+        static public string uploadimage(string filename)
         {
 
-            byte[] newfile = File.ReadAllBytes(file);
+            var file = File.ReadAllBytes(filename);
 
-            //c927064c3cd35e5
+            using (var w = new WebClient())
+            {
+                var values = new NameValueCollection
+                {
+                    {"image", Convert.ToBase64String(file)},
+                    {"type", "base64"}
+                };
+                //client.Headers.Add("Authorization", "BEARER " + accessToken);
+                w.Headers.Add("Authorization", "Client-ID c927064c3cd35e5");
+                var response = w.UploadValues("https://api.imgur.com/3/image", values);
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://api.imgur.com/3/image");
-            request.Headers.Add("Authorization", "Client-ID c927064c3cd35e5");
-            request.Method = "POST";
+                string jsonResults = Encoding.UTF8.GetString(response);
+                Console.WriteLine(jsonResults);
+                return jsonResults;
+            }
 
-            ASCIIEncoding enc = new ASCIIEncoding();
-            string postData = Convert.ToBase64String(newfile);
-            byte[] bytes = enc.GetBytes(postData);
-
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.ContentLength = bytes.Length;
-
-            Stream writer = request.GetRequestStream();
-            writer.Write(bytes, 0, bytes.Length);
-
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
         }
     }
 }

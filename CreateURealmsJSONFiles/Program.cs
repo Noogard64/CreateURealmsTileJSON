@@ -16,16 +16,18 @@ namespace CreateURealmsJSONFiles
 
             foreach (string file in files)
             {
-                UploadImage.UploadImageVersion2(file);
+
+                var replace = UploadImage.UploadImageToImgur(file);
+
+                var find = Functions.textToFindInJSON(file);
 
 
-                var find = "";
-                var replace = "";
                 Functions.UpdateJSONFile(newJsonFileName, find, replace);
             }
 
+            
             Console.WriteLine("Finished!");
-
+            Console.ReadKey();
 
 
         }
