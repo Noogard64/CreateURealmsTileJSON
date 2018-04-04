@@ -7,9 +7,9 @@ namespace CreateURealmsJSONFiles
         static void Main(string[] args)
         {
             Console.WriteLine("What's the folder path?");
-            //var folderPath = Console.ReadLine();
+            var folderPath = Console.ReadLine();
 
-            var folderPath = @"C:\Users\sean-\Desktop\urealms\Tiles\Regirock";
+            //var folderPath = @"C:\Users\sean-\Desktop\urealms\Tiles\Regirock";
 
             string[] files = Functions.GetImageFilesAsCollection(folderPath);
             string newJsonFileName = Functions.CreateJSONFileFromTemplate(folderPath);
