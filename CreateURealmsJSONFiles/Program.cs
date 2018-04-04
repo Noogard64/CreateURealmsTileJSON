@@ -20,7 +20,7 @@ namespace CreateURealmsJSONFiles
                 var replace = UploadImage.UploadImageToImgur(file);
 
                 var find = Functions.textToFindInJSON(file);
-
+                Console.WriteLine(find);
 
                 Functions.UpdateJSONFile(newJsonFileName, find, replace);
             }

@@ -46,7 +46,7 @@ namespace CreateURealmsJSONFiles
                 var response = w.UploadValues("https://api.imgur.com/3/image", values);
 
                 string jsonResults = Encoding.UTF8.GetString(response);
-                Console.WriteLine(jsonResults);
+                //Console.WriteLine(jsonResults);
                 return jsonResults;
             }
 
